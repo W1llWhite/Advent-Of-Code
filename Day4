@@ -1,0 +1,81 @@
+#take the input file and read the contents 
+with open('Day4.txt') as f:
+    lines = f.readlines()
+
+#iterate through the text file line by line, remove whitespace 
+lines = [ line.strip() for line in lines ]
+
+#take the first line of the text file, split each number by comma and save that as the called numbers
+calledNumbers = lines[0].split(',')
+
+ 
+def generatelookup(board):
+    """
+    Converts a 2d array to a dictionary of coordinate value to coordinates
+    """
+    d = {}
+    for i in range(0,len(board)):
+        for j,val in enumerate(board[i]): # [1,2,3] => [(0, 1), (1, 2), (2, 3)]
+            d[val] = (i,j)
+    return d
+
+#create empty boards
+boards = []
+board = []
+    
+#iterate though text file from third line, creates 2d array per board, generates a lookup at empty line, 
+for line in lines[2:]:
+    if len(line) == 0:
+        boards.append((generatelookup(board),set()))
+        board = []
+        continue
+    board.append(line.split()) # 0: [[1,1,1,1,1]] => 1: [[1,1,1,1,1], [2,2,2,2,2]]
+boards.append((generatelookup(board),set()))
+
+def processAndCheckIfWon(board,calledNumber):
+    """
+    Compares between called number and lookup table, adds x,y coordinates to marked list. Determines if any rows or columns have won
+    """
+    lookup,marked = board # ({}, set()) => looup = {}, makerd = set()
+
+    if calledNumber in lookup:
+
+        x,y = lookup[calledNumber]
+        marked.add((x,y))
+
+        #checks for win by looking down or along the line of marked numbers to see if they have all been called (aka a bingo)
+        columnWin = len([ 1 for posY in range(0,5) if (x,posY) in marked ]) == 5
+        rowWin = len([ 1 for posX in range(0,5) if (posX,y) in marked ]) == 5
+
+        if columnWin or rowWin:# summing all uncalled values on the board
+            return (True,sum([ int(i) for i in lookup if lookup[i] not in marked]))
+
+    return (False,None)
+
+won = False
+
+wonBoards = []
+wonCalledNumbers = []
+
+#process the winning boards, add them to the wonBoards list
+for calledNumber in calledNumbers:
+
+    #determine which boards to evaluate, loop over boards, check if it isnt in won boards, add to new list
+    boards_to_evaluate = [b for b in boards if b not in wonBoards]
+    for board in boards_to_evaluate:
+
+        won,unmarkedSum = processAndCheckIfWon(board,calledNumber)
+        
+        if won:
+            wonBoards.append(board)
+            wonCalledNumbers.append((unmarkedSum,calledNumber))
+ 
+
+#the first board to be added to the won list is the first win, and the last board is the final winner 
+unmarkedSum, winningNumber = wonCalledNumbers[0]
+first_winner = unmarkedSum*int(winningNumber)
+
+print("first winning solution solution = ", unmarkedSum * int(winningNumber))            
+           
+unmarkedSum, winningNumber = wonCalledNumbers[len(wonCalledNumbers)-1]
+print("last winning solution solution = ", unmarkedSum * int(winningNumber))
