@@ -1,18 +1,12 @@
-#take the input file and read the contents 
 with open('Day4.txt') as f:
     lines = f.readlines()
 
-#iterate through the text file line by line, remove whitespace 
+#iterate through the text file line by line, remove whitespace & split the lines with a ","
 lines = [ line.strip() for line in lines ]
-
-#take the first line of the text file, split each number by comma and save that as the called numbers
 calledNumbers = lines[0].split(',')
 
- 
 def generatelookup(board):
-    """
-    Converts a 2d array to a dictionary of coordinate value to coordinates
-    """
+    #Converts a 2d array to a dictionary of coordinate value to coordinates
     d = {}
     for i in range(0,len(board)):
         for j,val in enumerate(board[i]): # [1,2,3] => [(0, 1), (1, 2), (2, 3)]
@@ -33,9 +27,7 @@ for line in lines[2:]:
 boards.append((generatelookup(board),set()))
 
 def processAndCheckIfWon(board,calledNumber):
-    """
-    Compares between called number and lookup table, adds x,y coordinates to marked list. Determines if any rows or columns have won
-    """
+    #Compares between called number and lookup table, adds x,y coordinates to marked list. Determines if any rows or columns have won
     lookup,marked = board # ({}, set()) => looup = {}, makerd = set()
 
     if calledNumber in lookup:
